@@ -55,7 +55,7 @@
     <div class="brand">픽AI(PICKAI) · 토스 앱 (앱인토스)</div>
     <h1>개인정보처리방침</h1>
     <p class="meta">
-      시행일: 공개 URL 게시일과 동일하게 적용합니다.<br />
+      시행일: 2026년 10월 11일 (최초 공개 게시일)<br />
       서비스명: 픽AI(PICKAI) · 개인정보처리자(상호): 코드<br />
       적용 대상: 토스 앱 내 「픽AI(PICKAI)」 미니앱(앱 이름 pickai) 및 연결된 토스 전용 API
     </p>
@@ -85,7 +85,8 @@
       <li>
         <strong>앱(WebView):</strong> 토스 로그인 후 서버 교환 결과로
         Supabase Auth <code>access_token</code>, <code>refresh_token</code>,
-        앱인토스 <strong>userKey</strong>(숫자)를 <code>sessionStorage</code>에 저장합니다.
+        앱인토스 <strong>userKey</strong>(숫자)를 WebView <code>localStorage</code>에 저장합니다
+        (키: <code>pickai.intoss.toss_session.v1</code>). 미니앱을 다시 열었을 때 로그인 상태를 복원하는 데 사용됩니다.
       </li>
       <li>
         <strong>로그인 요청(앱 → Supabase Edge Function <code>exchange-toss-auth</code>):</strong>
@@ -118,7 +119,7 @@
         <code>@apps-in-toss/web-framework</code>의 <code>TossAuth.login()</code>으로 인가 코드·referrer를 받고, 위 Edge Function으로 교환합니다.
       </li>
       <li>
-        <strong>법무·운영 검토 대기:</strong> 토스·앱인토스 <strong>공식 문서</strong>상 SDK/WebView가 앱에 추가 제공하는 정보 범위(위 구현·UI 표시 외).
+        <strong>토스·앱인토스 SDK:</strong> 공식 문서·플랫폼 정책에 따라 로그인·WebView 환경에서 추가 정보가 제공될 수 있습니다. 위 항목은 현재 앱·서버 구현에서 확인된 범위입니다.
       </li>
     </ul>
     <p>Google·Naver 소셜 로그인 비밀번호는 수집·저장하지 않습니다.</p>
@@ -141,8 +142,8 @@
     <h3 style="font-size:16px;margin:20px 0 8px;color:#f5f5f7;">2.3 기기(브라우저) 로컬 저장</h3>
     <p>서버 동기화 전·실패 시 로컬에만 남을 수 있는 데이터(앱 구현):</p>
     <ul>
-      <li><code>localStorage</code>: 차트 AI 분석 기록·결과, 전망 분석 기록, 투자 부적 목록, 관심종목(로컬), 최근 본 종목, 종목 디렉터리 캐시, 언어 설정 등</li>
-      <li><code>sessionStorage</code>: 로그인 세션 토큰, OAuth <code>state</code></li>
+      <li><code>localStorage</code>: 로그인 세션(access·refresh 토큰, userKey), 차트 AI 분석 기록·결과, 전망 분석 기록, 투자 부적 목록, 관심종목(로컬), 최근 본 종목, 종목 디렉터리 캐시, 언어 설정 등</li>
+      <li><code>sessionStorage</code>: 로그인 진행 중 일시적 OAuth <code>state</code>, 로그인 후 복귀 경로 등(로그인 완료·취소 후 제거)</li>
     </ul>
 
     <h3 style="font-size:16px;margin:20px 0 8px;color:#f5f5f7;">2.4 차트·AI 분석</h3>
@@ -189,24 +190,23 @@
       <code>pickai:toss:</code> 형태인 사용자에 대해서는 웰컴 중복 방지용 social claim 백필을 하지 않습니다.
     </p>
     <p class="legal-note">
-      <strong>법무·운영 검토 대기 — 보유·파기:</strong> 회원 탈퇴 성공 시 서버 SQLite 연관 데이터 삭제(세부는
+      <strong>보유·파기:</strong> 회원 탈퇴 성공 시 서버 SQLite 연관 데이터 삭제(세부는
       <a href="account-deletion-toss.html">계정 삭제 안내</a>). 법령상 의무 보관·분쟁·부정 이용 방지·백업·운영 로그(내부 사용자 ID 포함 가능, §2.5)의
-      <strong>보관 기간·접근·파기</strong>는 코드에 정의되어 있지 않아 호스팅·Supabase·PM2 정책 확정 후 기재합니다.
+      <strong>보관 기간·접근·파기</strong>는 앱 코드에 상세 기간이 정의되어 있지 않으며, 호스팅·Supabase 등 운영 환경 정책에 따릅니다.
     </p>
-    <p>로컬 저장 데이터는 로그아웃·앱 삭제·브라우저 데이터 삭제 시 제거될 수 있습니다.</p>
+    <p>로컬 저장 데이터는 <strong>로그아웃</strong> 시 로그인 세션(<code>localStorage</code>)이 제거되고, 앱 삭제·브라우저 데이터 삭제 시 기타 로컬 데이터가 제거될 수 있습니다. 과거 버전에서 남은 세션 정보는 최초 읽기 시 <code>localStorage</code>로 이전될 수 있습니다.</p>
 
     <h2>4. 제3자 제공</h2>
     <p>
       이용자 동의 또는 법령에 따른 경우를 제외하고 개인정보를 제3자에게 판매하거나 제공하지 않습니다.
     </p>
-    <p class="legal-note">법무 검토 대기 — 법령상 제공·통계·마케팅 등 제3자 제공 예외 사유 문구.</p>
+    <p>법령에서 정한 경우(통계·과학적 연구 등 법령이 허용하는 범위)에는 개인정보를 제공할 수 있으며, 그 범위와 절차는 관련 법령을 따릅니다.</p>
 
     <h2>5. 처리 위탁·제공받는 자(연동)</h2>
     <p>서비스 제공을 위해 다음과 같은 외부 서비스를 이용할 수 있습니다.</p>
-    <p class="legal-note">
-      <strong>법무 검토 대기 — 위탁·재위탁:</strong> 아래 목록은 코드·운영에서 이용하는 연동 수단입니다.
-      수탁자별 위탁 업무·재위탁·이용자 고지 방식은 계약·법무 확인 후 본 절에 반영합니다.
-      앱 번들에는 Supabase <code>service_role</code>·토스 mTLS 개인키를 포함하지 않습니다(Edge·서버 전용).
+    <p>
+      아래 목록은 서비스 운영에서 이용하는 연동 수단입니다. 수탁자별 위탁 업무·재위탁·이용자 고지 방식은 계약 및 관련 법령에 따라 본 절을 업데이트할 수 있습니다.
+      앱 번들에는 Supabase 관리자 키·토스 mTLS 개인키를 포함하지 않습니다(Edge·서버 전용).
     </p>
     <ul>
       <li><strong>토스(앱인토스)·토스 파트너 API:</strong> 로그인·userKey 확인</li>
@@ -219,11 +219,9 @@
     </ul>
 
     <h2>6. 국외 이전</h2>
-    <p class="legal-note">
-      <strong>법무 검토 대기 — 국외 이전:</strong> OpenAI(차트·AI 분석 API), Supabase(Auth·Edge Function),
-      VPS 호스팅(토스 전용 API), 토스 파트너 API 등의 <strong>처리 국가·리전</strong>,
-      이전 항목·보유 기간·거부·동의 근거는 <strong>계약·대시보드 확인 후</strong> 기재합니다.
-      이전 여부·범위를 코드만으로 확정하지 않습니다.
+    <p>
+      OpenAI(차트·AI 분석), Supabase(Auth·Edge Function), VPS 호스팅(토스 전용 API), 토스 파트너 API 등 일부 처리는
+      <strong>국외에서 진행될 수 있습니다</strong>. 처리 국가·리전·이전 항목·보유 기간·동의·거부 방법은 제공자·계약·대시보드 설정에 따라 달라질 수 있으며, 변경 시 본 방침을 통해 안내할 수 있습니다.
     </p>
 
     <h2>7. 이용자의 권리</h2>
@@ -236,15 +234,15 @@
     <h2>8. 안전성 확보 조치</h2>
     <ul>
       <li>HTTPS 전송</li>
-      <li>액세스·리프레시 토큰을 WebView <code>sessionStorage</code>에 저장(기기 접근 시 노출 가능 — 이용자 기기 보안 필요)</li>
+      <li>액세스·리프레시 토큰·userKey를 WebView <code>localStorage</code>에 저장(기기 접근 시 노출 가능 — 이용자 기기 보안 필요). 로그아웃 시 해당 세션 정보를 제거합니다.</li>
       <li>서버·Supabase service role·mTLS 개인키 등은 앱에 포함하지 않음</li>
       <li>API·DB 접근 권한 제한(운영자·호스팅 환경에 따름)</li>
     </ul>
 
     <h2>9. 만 14세 미만</h2>
-    <p class="legal-note">
-      <strong>법무 검토 대기 — 연령:</strong> 앱·서버 코드에 만 14세 미만 차단·법정대리인 동의 수집 플로우는 없습니다.
-      서비스 이용 연령·법정대리인 동의는 앱인토스·토스 정책 및 법무 검토 후 기재합니다.
+    <p>
+      앱·서버에 만 14세 미만 전용 차단·법정대리인 동의 수집 절차는 구현되어 있지 않습니다.
+      서비스 이용 가능 연령·법정대리인 동의는 <strong>앱인토스·토스 정책</strong>을 따릅니다.
     </p>
 
     <h2>10. 문의</h2>
@@ -261,8 +259,6 @@
       <strong>개인정보 문의 연락처:</strong> <a href="mailto:uyh00001@gmail.com">uyh00001@gmail.com</a>
     </p>
     <p class="legal-note">사업자등록증·통신판매업 신고증과 위 사업자 표시 내용의 일치는 운영자가 확인했습니다(2026-10-10).</p>
-    <p class="legal-note">시행일은 공개 URL 첫 게시일로 정하며, 게시 전까지는 상단 「시행일」 문구만 적용합니다(사전 고정 일자 없음).</p>
-
     <div class="footer">
       <a href="terms-toss.html">이용약관</a> ·
       <a href="https://uyh11225-source.github.io/moa-privacy/contact.html" rel="noopener">문의하기 (공통)</a> ·

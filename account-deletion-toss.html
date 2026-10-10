@@ -47,7 +47,7 @@
     <div class="brand">픽AI(PICKAI) · 토스 앱 (앱인토스)</div>
     <h1>계정 및 데이터 삭제</h1>
     <p class="meta">
-      시행일: 공개 URL 게시일과 동일하게 적용합니다.<br />
+      시행일: 2026년 10월 11일 (최초 공개 게시일)<br />
       서비스명: 픽AI(PICKAI) (토스 미니앱, appName: pickai) · 사업자 상호: 코드<br />
       이 페이지는 로그인 없이 열 수 있습니다.
     </p>
@@ -87,7 +87,7 @@
       탈퇴 진행·완료 후에는 동일 JWT로 서버에 계정이 재생성되지 않습니다.
     </p>
     <p>
-      로그아웃만 하면 <code>sessionStorage</code>의 액세스·리프레시 토큰이 제거되지만,
+      로그아웃만 하면 <code>localStorage</code>에 저장된 로그인 세션(액세스·리프레시 토큰, userKey)이 제거되지만,
       서버에 남은 계정·기록은 삭제되지 않습니다. 완전 탈퇴는 계정 삭제를 이용하세요.
     </p>
 
@@ -109,8 +109,8 @@
     <ul>
       <li>제목 또는 본문에 「픽AI 토스 앱 계정 삭제 요청」</li>
       <li>토스 로그인을 사용했음을 명시</li>
-      <li>앱인토스 <strong>userKey</strong>(숫자) — 로그인 세션(<code>sessionStorage</code>)에 저장되는 값</li>
-      <li><strong>운영 검토 대기:</strong> userKey 외 추가 본인 확인(예: 스크린샷·기기 정보) 필요 여부 — 운영자가 수동 처리 시 최소 항목으로 정합니다.</li>
+      <li>앱인토스 <strong>userKey</strong>(숫자) — 로그인 세션(<code>localStorage</code>)에 저장되는 값</li>
+      <li>userKey 외 추가 본인 확인(예: 스크린샷·기기 정보)이 필요한 경우, 이메일 탈퇴 요청 시 운영자가 안내합니다.</li>
       <li>Google·Naver 계정 이메일은 토스 픽AI 본인 확인에 사용하지 않을 수 있음</li>
     </ul>
 
@@ -128,37 +128,30 @@
       access JWT는 만료 전까지 서명 검증만 통과할 수 있으나, 위 재생성 차단으로 서비스 이용은 되지 않습니다.
     </p>
     <p>
-      Supabase Auth 사용자 삭제는 서버 환경 변수로 제어됩니다(배포 예시 파일 기준 <strong>기본 비활성</strong>).
-      활성화된 환경에서만 service role로 Auth 사용자를 삭제합니다.
-      미완료 작업은 <code>account_deletion_jobs</code>에 남고, 운영 설정 시 JWT 없이 내부 복구를 시도할 수 있습니다.
+      Supabase Auth 사용자 삭제는 <strong>서버 운영 설정</strong>으로 제어됩니다(일반적으로 출시 전 <strong>비활성</strong>).
+      설정이 활성화된 환경에서만 서버가 Supabase Auth 사용자를 삭제합니다.
+      탈퇴 처리가 중간에 멈추면 서버에 작업 기록이 남을 수 있으며, 운영 설정에 따라 내부 복구를 시도할 수 있습니다.
     </p>
     <p>
-      미완료 탈퇴 작업(<code>account_deletion_jobs.phase = sqlite_deleted</code>)에 대한
-      <strong>자동 알림·대시보드·주기 스케줄</strong>은 코드에 없습니다.
-      <code>PICKAI_TOSS_ACCOUNT_DELETION_RECOVERY_ENABLED=1</code>일 때 서버 기동 후 1회 sweep 및
-      처리 건수 로그만 기록합니다.
+      미완료 탈퇴 작업에 대한 <strong>자동 알림·대시보드·주기 스케줄</strong>은 제공하지 않습니다.
+      탈퇴 복구 기능이 활성화된 서버는 기동 시 1회 정리 작업을 수행하고 처리 건수를 로그에 남길 수 있습니다.
     </p>
     <p>
-      <strong>운영 env(2026-10-10 읽기 전용 점검):</strong>
-      <code>PICKAI_TOSS_SUPABASE_AUTH_DELETE_ENABLED</code>·
-      <code>PICKAI_TOSS_ACCOUNT_DELETION_RECOVERY_ENABLED</code>는
-      <strong>비활성(미설정 또는 0)</strong>이었습니다.
-      미완료 job에 대한 자동 알림·대시보드·주기 스케줄은 없습니다.
-      복구 env=1이고 Auth 삭제가 활성화된 경우에만 기동 1회 sweep 및 처리 건수 로그가 있습니다.
-      출시 전 게이트 활성화·운영 runbook은 별도 승인 후 정합니다.
+      <strong>운영 상태(2026-10-10 읽기 전용 점검):</strong> Supabase Auth 자동 삭제·탈퇴 복구 기능은
+      <strong>비활성</strong>이었습니다. 활성화·운영 절차는 별도 승인 후 적용합니다.
     </p>
 
     <h2>4. 기기(로컬)에서 제거되는 데이터</h2>
     <p>탈퇴 <strong>성공</strong> 시 앱은 로그아웃 처리 후 아래 로컬 데이터를 제거합니다. 로그아웃만 하면 세션만 제거됩니다.</p>
     <ul>
-      <li><code>sessionStorage</code>: 로그인 세션(access·refresh 토큰, userKey)</li>
+      <li><code>localStorage</code>: 로그인 세션(access·refresh 토큰, userKey)</li>
       <li><code>localStorage</code>: 로컬 차트·전망 분석 기록, 투자 부적 목록, 로컬 관심종목, 최근 본 종목 등</li>
     </ul>
     <p>로컬 삭제 대상에는 차트·전망 분석 기록, 투자 부적 목록, 로컬 관심종목, 최근 본 종목, 종목 디렉터리 캐시 등이 포함됩니다.</p>
 
     <h2>5. 삭제 후에도 남을 수 있는 데이터</h2>
     <ul>
-      <li>서버·Supabase·호스팅 <strong>운영 로그</strong>(요청 시각, 경로, 오류, 내부 사용자 ID 등) — 보관 기간·접근은 <a href="privacy-policy-toss.html">개인정보처리방침</a> §2.5·§3(법무·운영 검토 대기)과 동일하게 확정 후 기재</li>
+      <li>서버·Supabase·호스팅 <strong>운영 로그</strong>(요청 시각, 경로, 오류, 내부 사용자 ID 등) — 보관 기간·접근은 <a href="privacy-policy-toss.html">개인정보처리방침</a> §2.5·§3과 같습니다.</li>
       <li>법령상 보관 의무가 있는 기록 — 현재 토스 결제 미연동 시 해당 없을 수 있음</li>
     </ul>
     <p>
